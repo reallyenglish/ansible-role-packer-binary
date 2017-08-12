@@ -1,0 +1,6 @@
+---
+
+- name: Restart packer-binary
+  service:
+    name: packer-binary
+    state: restarted

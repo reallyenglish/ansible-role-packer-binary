@@ -1,0 +1,2 @@
+__packer-binary_db_dir: /var/db/packer-binary
+__packer-binary_conf_dir: /usr/local/etc/packer-binary

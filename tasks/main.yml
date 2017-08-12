@@ -1,0 +1,37 @@
+---
+# tasks file for ansible-role-packer-binary
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- include: "install-{{ ansible_os_family }}.yml"
+
+- name: Create log directory
+  file:
+    path: "{{ packer-binary_log_dir }}"
+    mode: 0755
+    owner: "{{ packer-binary_user }}"
+    group: "{{ packer-binary_group }}"
+    state: directory
+  notify: Restart packer-binary
+
+- name: Create db directory
+  file:
+    path: "{{ packer-binary_db_dir }}"
+    mode: 0755
+    owner: "{{ packer-binary_user }}"
+    group: "{{ packer-binary_group }}"
+    state: directory
+  notify: Restart packer-binary
+
+- name: Create packer-binary.conf
+  template:
+    src: packer-binary.conf.j2
+    dest: "{{ packer-binary_conf_file }}"
+    validate: echo %s
+  notify: Restart packer-binary
+
+- name: Start packer-binary
+  service:
+    name: "{{ packer-binary_service }}"
+    enabled: true
+    state: started

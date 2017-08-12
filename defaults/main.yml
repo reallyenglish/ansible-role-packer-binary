@@ -1,0 +1,8 @@
+packer-binary_user: packer-binary
+packer-binary_group: packer-binary
+packer-binary_log_dir: /var/log/packer-binary
+packer-binary_db_dir: "{{ __packer-binary_db_dir }}"
+packer-binary_service: packer-binary
+packer-binary_conf_dir: "{{ __packer-binary_conf_dir }}"
+packer-binary_conf_file: "{{ __packer-binary_conf_dir }}/packer-binary.conf"
+packer-binary_flags: ""

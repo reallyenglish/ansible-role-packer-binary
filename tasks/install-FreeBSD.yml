@@ -1,0 +1,6 @@
+---
+
+- name: Install packer-binary
+  pkgng:
+    name: packer-binary
+    state: present
