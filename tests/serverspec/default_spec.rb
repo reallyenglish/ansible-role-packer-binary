@@ -3,7 +3,7 @@ require "serverspec"
 
 version = "1.0.4"
 dir = "/usr/bin"
-symlink_name = "packer.io"
+symlink_name = "packer"
 cache_dir = "/var/cache/packer-binary"
 os_type = "linux"
 default_user = "root"
