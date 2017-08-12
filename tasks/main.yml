@@ -1,37 +1,44 @@
 ---
-# tasks file for ansible-role-packer-binary
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
 - include: "install-{{ ansible_os_family }}.yml"
 
-- name: Create log directory
+- name: Create packer_binary_cache_dir
   file:
-    path: "{{ packer-binary_log_dir }}"
+    path: "{{ packer_binary_cache_dir }}"
     mode: 0755
-    owner: "{{ packer-binary_user }}"
-    group: "{{ packer-binary_group }}"
+    owner: "{{ packer_binary_owner }}"
+    group: "{{ packer_binary_group }}"
     state: directory
-  notify: Restart packer-binary
 
-- name: Create db directory
+- name: Fetch packer archive
+  get_url:
+    url: "{{ packer_binary_url }}"
+    dest: "{{ packer_binary_cache_dir }}"
+    owner: "{{ packer_binary_owner }}"
+    group: "{{ packer_binary_group }}"
+    sha256sum: "{{ packer_binary_sha256sum[packer_binary_filename] }}"
+
+- name: Create destination directory
   file:
-    path: "{{ packer-binary_db_dir }}"
+    path: "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}"
     mode: 0755
-    owner: "{{ packer-binary_user }}"
-    group: "{{ packer-binary_group }}"
+    owner: "{{ packer_binary_owner }}"
+    group: "{{ packer_binary_group }}"
     state: directory
-  notify: Restart packer-binary
 
-- name: Create packer-binary.conf
-  template:
-    src: packer-binary.conf.j2
-    dest: "{{ packer-binary_conf_file }}"
-    validate: echo %s
-  notify: Restart packer-binary
+- name: Extract packer archive
+  unarchive:
+    src: "{{ packer_binary_cache_dir }}/{{ packer_binary_filename }}"
+    owner: "{{ packer_binary_owner }}"
+    group: "{{ packer_binary_group }}"
+    dest:    "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}"
+    creates: "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}/packer"
+    mode: "{{ packer_binary_mode }}"
 
-- name: Start packer-binary
-  service:
-    name: "{{ packer-binary_service }}"
-    enabled: true
-    state: started
+- name: Create symlink to the binary
+  file:
+    path: "{{ packer_binary_path }}"
+    src: "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}/packer"
+    state: link

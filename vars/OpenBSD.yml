@@ -2,5 +2,5 @@ __packer_binary_owner: root
 __packer_binary_group: wheel
 __packer_binary_name: packer
 __packer_binary_dir: /usr/local/bin
-__packer_binary_os_type: freebsd
+__packer_binary_os_type: openbsd
 __packer_binary_cache_dir: /var/cache/packer-binary

@@ -1,58 +1,64 @@
 require "spec_helper"
 require "serverspec"
 
-package = "packer-binary"
-service = "packer-binary"
-config  = "/etc/packer-binary/packer-binary.conf"
-user    = "packer-binary"
-group   = "packer-binary"
-ports   = [PORTS]
-log_dir = "/var/log/packer-binary"
-db_dir  = "/var/lib/packer-binary"
+version = "1.0.4"
+dir = "/usr/bin"
+symlink_name = "packer.io"
+cache_dir = "/var/cache/packer-binary"
+os_type = "linux"
+default_user = "root"
+default_group = "root"
+mode = 755
 
 case os[:family]
+when "redhat"
+  symlink_name = "packer.io"
+when "openbsd"
+  os_type = "openbsd"
+  default_group = "wheel"
+  dir = "/usr/local/bin"
 when "freebsd"
-  config = "/usr/local/etc/packer-binary.conf"
-  db_dir = "/var/db/packer-binary"
+  os_type = "freebsd"
+  default_group = "wheel"
+  dir = "/usr/local/bin"
+end
+filename = "packer_#{version}_#{os_type}_amd64"
+owner = default_user
+group = default_group
+
+describe file(cache_dir) do
+  it { should exist }
+  it { should be_directory }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 755 }
 end
 
-describe package(package) do
-  it { should be_installed }
-end
-
-describe file(config) do
+describe file("#{cache_dir}/#{filename}.zip") do
+  it { should exist }
   it { should be_file }
-  its(:content) { should match Regexp.escape("packer-binary") }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
 end
 
-describe file(log_dir) do
+describe file("#{dir}/#{symlink_name}") do
   it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
+  it { should be_symlink }
+  it { should be_linked_to "#{dir}/#{filename}/packer" }
 end
 
-describe file(db_dir) do
+describe file("#{dir}/#{filename}/packer") do
   it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
+  it { should be_file }
+  it { should be_owned_by owner }
   it { should be_grouped_into group }
+  it { should be_mode mode }
 end
 
-case os[:family]
-when "freebsd"
-  describe file("/etc/rc.conf.d/packer-binary") do
-    it { should be_file }
-  end
-end
-
-describe service(service) do
-  it { should be_running }
-  it { should be_enabled }
-end
-
-ports.each do |p|
-  describe port(p) do
-    it { should be_listening }
-  end
+# Packer v1.0.4
+describe command("#{symlink_name} version") do
+  its(:exit_status) { should eq 0 }
+  its(:stdout) { should match(/^Packer v#{Regexp.escape(version)}$/) }
+  its(:stderr) { should eq "" }
 end

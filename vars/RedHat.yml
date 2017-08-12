@@ -1,0 +1,6 @@
+__packer_binary_owner: root
+__packer_binary_group: root
+__packer_binary_name: packer.io
+__packer_binary_dir: /usr/bin
+__packer_binary_os_type: linux
+__packer_binary_cache_dir: /var/cache/packer-binary

@@ -2,4 +2,3 @@
   roles:
     - ansible-role-packer-binary
   vars:
-    packer-binary_config: ""
