@@ -35,6 +35,7 @@
     group: "{{ packer_binary_group }}"
     dest:    "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}"
     creates: "{{ packer_binary_dir }}/{{ packer_binary_sym_name }}/packer"
+    remote_src: yes
     mode: "{{ packer_binary_mode }}"
 
 - name: Create symlink to the binary
