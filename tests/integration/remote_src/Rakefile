@@ -36,7 +36,9 @@ end
 
 desc "import required roles"
 task :prepare_roles do
-  sh "ansible-galaxy install -r requirements.yml -p roles"
+  # rubocop:disable Metrics/LineLength
+  sh "if [ -f requirements.yml ]; then ansible-galaxy install -r requirements.yml -p roles; fi"
+  # rubocop:enable Metrics/LineLength
 end
 
 desc "clean up required roles"
